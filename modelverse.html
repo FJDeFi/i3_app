@@ -144,65 +144,6 @@
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Category Filter Buttons - Compact Size */
-        .category-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 5px 10px;
-            font-size: 12px;
-            font-weight: 500;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            background: white;
-            color: #374151;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        
-        .category-btn:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-        }
-        
-        .category-btn.active {
-            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-            color: white;
-            border-color: #2563eb;
-        }
-        
-        .category-btn.active:hover {
-            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-        }
-        
-        .category-label {
-            font-weight: 500;
-        }
-        
-        .category-count {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            min-width: 20px;
-            height: 18px;
-            padding: 0 5px;
-            font-size: 10px;
-            font-weight: 600;
-            border-radius: 9px;
-            background: rgba(0, 0, 0, 0.08);
-            color: #374151;
-        }
-        
-        .category-btn.active .category-count {
-            background: rgba(255, 255, 255, 0.25);
-            color: white;
-        }
-        
-        #moreCategoriesBtn:hover {
-            background: #f3f4f6;
-            border-color: #9ca3af;
-        }
-        
 		.wallet-modal {
 		  display: flex !important;            /* 始终 flex 布局 */
 		  align-items: center !important;      /* 始终垂直居中 */
@@ -790,10 +731,9 @@
                         z-index: 9999;
                         padding: 20px;
                         margin: 20px auto;
-                        max-width: 1000px;
+                        max-width: 800px;
                         text-align: center;
                     ">
-                        <!-- Search Box -->
                         <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
                             <input 
                                 type="text" 
@@ -849,100 +789,11 @@
                                 Clear
                             </button>
                         </div>
-                        
-                        <!-- Category Filter -->
-                        <div id="categoryFilter" style="margin: 20px 0; background: linear-gradient(to bottom, #ffffff, #f9fafb); padding: 16px; border-radius: 12px; border: 1px solid #e5e7eb;">
-                            <div style="text-align: center; margin-bottom: 12px;">
-                                <span style="font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; color: #6b7280;">Filter by Category</span>
-                            </div>
-                            
-                            <!-- Main Categories -->
-                            <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin-bottom: 10px;">
-                                <button class="category-btn active" data-category="all" onclick="filterByCategory('all')">
-                                    <span class="category-label">All</span>
-                                    <span class="category-count">300</span>
-                                </button>
-                                <button class="category-btn" data-category="Computer Vision & Neuroscience-Inspired Models" onclick="filterByCategory('Computer Vision & Neuroscience-Inspired Models')">
-                                    <span class="category-label">Computer Vision</span>
-                                    <span class="category-count">135</span>
-                                </button>
-                                <button class="category-btn" data-category="Reinforcement Learning & Optimization" onclick="filterByCategory('Reinforcement Learning & Optimization')">
-                                    <span class="category-label">RL & Optimization</span>
-                                    <span class="category-count">163</span>
-                                </button>
-                                <button class="category-btn" data-category="Explainable AI & Interpretability" onclick="filterByCategory('Explainable AI & Interpretability')">
-                                    <span class="category-label">Explainable AI</span>
-                                    <span class="category-count">101</span>
-                                </button>
-                                <button class="category-btn" data-category="Natural Language Processing" onclick="filterByCategory('Natural Language Processing')">
-                                    <span class="category-label">NLP</span>
-                                    <span class="category-count">34</span>
-                                </button>
-                                <button class="category-btn" data-category="AI Platform Operations" onclick="filterByCategory('AI Platform Operations')">
-                                    <span class="category-label">AI Platforms</span>
-                                    <span class="category-count">32</span>
-                                </button>
-                                <button class="category-btn" data-category="Content Generation & World Models" onclick="filterByCategory('Content Generation & World Models')">
-                                    <span class="category-label">Content Gen</span>
-                                    <span class="category-count">28</span>
-                                </button>
-                                <button id="moreCategoriesBtn" onclick="toggleMoreCategories()" style="padding: 5px 10px; font-size: 12px; border: 1px solid #d1d5db; border-radius: 6px; background: white; color: #6b7280; cursor: pointer; transition: all 0.2s; font-weight: 500;">
-                                    More ▼
-                                </button>
-                            </div>
-                            
-                            <!-- More Categories (Hidden by default) -->
-                            <div id="moreCategories" style="display: none; flex-wrap: wrap; justify-content: center; gap: 6px; padding-top: 10px; border-top: 1px solid #e5e7eb;">
-                                <button class="category-btn" data-category="Time Series & Financial Modeling" onclick="filterByCategory('Time Series & Financial Modeling')">
-                                    <span class="category-label">Time Series</span>
-                                    <span class="category-count">27</span>
-                                </button>
-                                <button class="category-btn" data-category="Graph Neural Networks & Relational Reasoning" onclick="filterByCategory('Graph Neural Networks & Relational Reasoning')">
-                                    <span class="category-label">Graph NN</span>
-                                    <span class="category-count">20</span>
-                                </button>
-                                <button class="category-btn" data-category="Clinical & Biomedical AI" onclick="filterByCategory('Clinical & Biomedical AI')">
-                                    <span class="category-label">Biomedical AI</span>
-                                    <span class="category-count">18</span>
-                                </button>
-                                <button class="category-btn" data-category="Web3 / Blockchain & Decentralized AI" onclick="filterByCategory('Web3 / Blockchain & Decentralized AI')">
-                                    <span class="category-label">Web3/Blockchain</span>
-                                    <span class="category-count">18</span>
-                                </button>
-                                <button class="category-btn" data-category="Federated & Distributed Learning" onclick="filterByCategory('Federated & Distributed Learning')">
-                                    <span class="category-label">Federated Learning</span>
-                                    <span class="category-count">13</span>
-                                </button>
-                                <button class="category-btn" data-category="Security (Red Teaming & Adversarial)" onclick="filterByCategory('Security (Red Teaming & Adversarial)')">
-                                    <span class="category-label">Security</span>
-                                    <span class="category-count">8</span>
-                                </button>
-                                <button class="category-btn" data-category="Privacy & Confidential Learning" onclick="filterByCategory('Privacy & Confidential Learning')">
-                                    <span class="category-label">Privacy</span>
-                                    <span class="category-count">6</span>
-                                </button>
-                                <button class="category-btn" data-category="Multimodal Learning" onclick="filterByCategory('Multimodal Learning')">
-                                    <span class="category-label">Multimodal</span>
-                                    <span class="category-count">6</span>
-                                </button>
-                                <button class="category-btn" data-category="Robotics & Autonomous Systems" onclick="filterByCategory('Robotics & Autonomous Systems')">
-                                    <span class="category-label">Robotics</span>
-                                    <span class="category-count">6</span>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Search Results Info (shown during search) -->
                         <div id="searchResults" style="
                             color: #6b7280;
-                            font-size: 13px;
-                            font-weight: 500;
-                            text-align: center;
-                            margin: 16px 0;
-                            padding: 8px;
-                            background: #f9fafb;
-                            border-radius: 6px;
-                            display: none;
+                            font-size: 14px;
+                            font-weight: 400;
+                            margin-top: 10px;
                         "></div>
                     </div>
                     
@@ -966,21 +817,6 @@
                         <tbody>
                         </tbody>
                     </table>
-                </div>
-                
-                <!-- Category Info at Bottom -->
-                <div id="categoryInfo" style="
-                    text-align: center;
-                    padding: 20px;
-                    margin-top: 24px;
-                    font-size: 13px;
-                    color: #6b7280;
-                    font-weight: 500;
-                    background: #f9fafb;
-                    border-radius: 8px;
-                    border: 1px solid #e5e7eb;
-                ">
-                    Showing all models (300)
                 </div>
             </div>
         </main>
@@ -1125,12 +961,7 @@
             
             tableRows.forEach(row => {
                 const modelName = row.querySelector('.model-name').textContent.toLowerCase();
-                const modelData = getModelData(modelName);
-                
-                const matchesSearch = modelName.includes(searchTerm);
-                const matchesCategory = currentCategory === 'all' || (modelData && modelData.tabs && modelData.tabs.includes(currentCategory));
-                
-                if (matchesSearch && matchesCategory) {
+                if (modelName.includes(searchTerm)) {
                     row.style.display = '';
                     matchCount++;
                 } else {
@@ -1139,98 +970,24 @@
             });
             
             if (searchTerm.length > 0) {
-                resultsDiv.textContent = `🔍 Found ${matchCount} matching models`;
-                resultsDiv.style.display = 'block';
+                resultsDiv.textContent = `Showing ${matchCount} / ${totalCount} models`;
             } else {
-                resultsDiv.textContent = '';
-                resultsDiv.style.display = 'none';
+                resultsDiv.textContent = `Showing ${totalCount} / ${totalCount} models`;
             }
         }
 
         
         function clearSearch() {
             document.getElementById('searchInput').value = '';
-            const resultsDiv = document.getElementById('searchResults');
-            
-            // Clear search results display
-            resultsDiv.textContent = '';
-            resultsDiv.style.display = 'none';
-            
-            // Reset to current category filter
-            if (typeof currentCategory !== 'undefined') {
-                filterByCategory(currentCategory);
-            }
-        }
-
-        // Category Filter Functions
-        let currentCategory = 'all';
-        
-        function toggleMoreCategories() {
-            const moreDiv = document.getElementById('moreCategories');
-            const btn = document.getElementById('moreCategoriesBtn');
-            if (moreDiv.style.display === 'none' || !moreDiv.style.display) {
-                moreDiv.style.display = 'flex';
-                btn.innerHTML = 'Less ▲';
-            } else {
-                moreDiv.style.display = 'none';
-                btn.innerHTML = 'More ▼';
-            }
-        }
-        
-        function filterByCategory(category) {
-            currentCategory = category;
-            
-            // Update button styles using classes only
-            const btns = document.querySelectorAll('.category-btn');
-            btns.forEach(btn => {
-                if (btn.dataset.category === category) {
-                    btn.classList.add('active');
-                } else {
-                    btn.classList.remove('active');
-                }
-            });
-            
-            // Filter table rows
             const tableRows = document.querySelectorAll('.models-table tbody tr');
-            let visibleCount = 0;
+            const resultsDiv = document.getElementById('searchResults');
             
             tableRows.forEach(row => {
-                const modelName = row.querySelector('.model-name')?.textContent.trim();
-                if (!modelName) return;
-                
-                // Try to get model data from global MODEL_DATA object
-                const modelData = (typeof MODEL_DATA !== 'undefined' && MODEL_DATA) ? MODEL_DATA[modelName] : null;
-                
-                if (category === 'all') {
-                    row.style.display = '';
-                    visibleCount++;
-                } else {
-                    // Check if model has this category in its tabs
-                    if (modelData && modelData.tabs && modelData.tabs.includes(category)) {
-                        row.style.display = '';
-                        visibleCount++;
-                    } else {
-                        row.style.display = 'none';
-                    }
-                }
+                row.style.display = '';
             });
             
-            // Update category info text at bottom
             const totalCount = tableRows.length;
-            const categoryInfo = document.getElementById('categoryInfo');
-            if (category === 'all') {
-                categoryInfo.innerHTML = `<span style="font-weight: 600;">📊 Showing all models</span> <span style="color: #3b82f6; font-weight: 700;">(${visibleCount})</span>`;
-            } else {
-                const shortName = category.split(' & ')[0]; // Better truncation
-                categoryInfo.innerHTML = `<span style="font-weight: 600;">📊 ${shortName}</span> <span style="color: #3b82f6; font-weight: 700;">(${visibleCount} models)</span>`;
-            }
-            
-            // Clear search results div when filtering by category
-            const resultsDiv = document.getElementById('searchResults');
-            if (resultsDiv) {
-                resultsDiv.textContent = '';
-                resultsDiv.style.display = 'none';
-            }
+            resultsDiv.textContent = `Showing ${totalCount} / ${totalCount} models`;
         }
 
 
@@ -1376,7 +1133,13 @@
 		    tbody.appendChild(row);
 		  });
 
-		  // Statistics display handled by categoryInfo
+		  // —— 维持你原先的统计展示 —— 
+		  const forcedTotal = 202;
+		  const totalCount = 202;
+		  const resultsDiv = document.getElementById('searchResults');
+		  if (resultsDiv) {
+		    resultsDiv.textContent = `Showing ${totalCount} / ${forcedTotal} models`;
+		  }
 		}
 
 		  // 页面加载后生成

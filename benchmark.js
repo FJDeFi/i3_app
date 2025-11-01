@@ -36,58 +36,6 @@ function showLoadingState() {
     }
 }
 
-// 从 MODEL_DATA 获取模型并按分数排序
-function getTopModelsByScore(limit = 100) {
-    if (typeof MODEL_DATA === 'undefined') {
-        console.error('MODEL_DATA is not defined');
-        return [];
-    }
-    
-    // 将 MODEL_DATA 对象转换为数组，并添加缺失的字段
-    const modelsArray = Object.entries(MODEL_DATA).map(([name, data]) => ({
-        name: name,
-        ...data,
-        // 添加缺失的 usage 字段（基于 purchasedPercent 计算）
-        usage: Math.floor((data.purchasedPercent || 0) * 1000),
-        // 确保所有字段都有默认值
-        tokenPrice: data.tokenPrice || 0,
-        sharePrice: data.sharePrice || 0,
-        change: data.change || 0,
-        compatibility: data.compatibility || 0,
-        totalScore: data.totalScore || 0,
-        category: data.category || 'Unknown',
-        industry: data.industry || 'Unknown'
-    }));
-    
-    // 按 totalScore 降序排序
-    modelsArray.sort((a, b) => (b.totalScore || 0) - (a.totalScore || 0));
-    
-    // 返回前 limit 个
-    return modelsArray.slice(0, limit);
-}
-
-// Benchmark Category Filter State
-let currentBenchmarkCategory = 'all';
-
-// Filter Benchmark by Category
-function filterBenchmarkByCategory(category) {
-    console.log('🔍 Filtering benchmark by category:', category);
-    currentBenchmarkCategory = category;
-    
-    // Update button styles
-    const btns = document.querySelectorAll('.benchmark-cat-btn');
-    btns.forEach(btn => {
-        if (btn.dataset.category === category) {
-            btn.classList.add('active');
-        } else {
-            btn.classList.remove('active');
-        }
-    });
-    
-    // Apply all filters (including category filter)
-    applyAllFilters();
-}
-
 // 标签页切换功能
 function switchTab(tabName) {
     currentTab = tabName;
@@ -97,42 +45,29 @@ function switchTab(tabName) {
     tabButtons.forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
     
-    // 切换表格和筛选面板显示
+    // 切换表格显示
     const modelTable = document.getElementById('modelBenchmarkTable');
     const peerTable = document.getElementById('peerBenchmarkTable');
-    const modelFilterPanel = document.querySelector('.benchmark-header .unified-filter-panel');
-    const peerFilterWrapper = document.getElementById('peerFilterWrapper');
     
     if (tabName === 'model') {
         modelTable.style.display = 'block';
         peerTable.style.display = 'none';
-        if (modelFilterPanel) modelFilterPanel.style.display = 'block';
-        if (peerFilterWrapper) peerFilterWrapper.style.display = 'none';
         loadModelBenchmark();
     } else {
         modelTable.style.display = 'none';
         peerTable.style.display = 'block';
-        if (modelFilterPanel) modelFilterPanel.style.display = 'none';
-        if (peerFilterWrapper) peerFilterWrapper.style.display = 'flex';
         loadPeerBenchmark();
     }
 }
 
 // 加载模型基准测试数据
 function loadModelBenchmark() {
-    console.log('🔍 loadModelBenchmark called');
-    console.log('🔍 MODEL_DATA type:', typeof MODEL_DATA);
-    console.log('🔍 MODEL_DATA keys count:', MODEL_DATA ? Object.keys(MODEL_DATA).length : 0);
-    
-    if (typeof MODEL_DATA === 'undefined') {
+    if (typeof MODEL_STATS === 'undefined') {
         console.error('❌ model-data.js 未正确加载');
         return;
     }
     
     const allModels = getTopModelsByScore(100);
-    console.log('🔍 allModels length:', allModels.length);
-    console.log('🔍 First model sample:', allModels[0]);
-    
     PAGINATION_CONFIG.modelBenchmark.totalItems = allModels.length;
     PAGINATION_CONFIG.modelBenchmark.totalPages = Math.ceil(allModels.length / PAGINATION_CONFIG.modelBenchmark.itemsPerPage);
     
@@ -144,15 +79,12 @@ function loadModelBenchmark() {
 
 // 显示模型基准测试指定页面
 function displayModelBenchmarkPage(page) {
-    console.log('🔍 displayModelBenchmarkPage called with page:', page);
     PAGINATION_CONFIG.modelBenchmark.currentPage = page;
     
     const allModels = getTopModelsByScore(100);
-    console.log('🔍 allModels for page:', allModels.length);
     const startIndex = (page - 1) * PAGINATION_CONFIG.modelBenchmark.itemsPerPage;
     const endIndex = startIndex + PAGINATION_CONFIG.modelBenchmark.itemsPerPage;
     const pageModels = allModels.slice(startIndex, endIndex);
-    console.log('🔍 pageModels:', pageModels.length, 'models for page', page);
     
     populateBenchmarkTable(pageModels);
     addPagination('modelBenchmark');
@@ -160,7 +92,7 @@ function displayModelBenchmarkPage(page) {
 
 // 加载同行基准测试数据
 function loadPeerBenchmark() {
-    if (typeof MODEL_DATA === 'undefined') {
+    if (typeof MODEL_STATS === 'undefined') {
         console.error('❌ model-data.js 未正确加载');
         return;
     }
@@ -317,8 +249,7 @@ function generatePeerBenchmarkData() {
             pwcScore: pwcScore,
             economicValue: economicValue,
             lateralComp: lateralComp,
-            totalScore: totalScore,
-            tabs: modelData.tabs || ['Natural Language Processing']  // 添加 tabs 字段支持分类筛选
+            totalScore: totalScore
         };
     });
     
@@ -936,13 +867,6 @@ function applyAllFilters() {
     
     let filteredData = [...originalModelsData];
     
-    // Category 筛选
-    if (currentBenchmarkCategory !== 'all') {
-        filteredData = filteredData.filter(model => {
-            return model.tabs && model.tabs.includes(currentBenchmarkCategory);
-        });
-    }
-    
     // 搜索筛选
     if (currentFilters.search) {
         filteredData = filteredData.filter(model => 
@@ -1059,185 +983,3 @@ window.filterByScore = filterByScore;
 window.filterByUsage = filterByUsage;
 window.sortBenchmarkTable = sortBenchmarkTable;
 window.clearAllFilters = clearAllFilters;
-
-// ========== Peer Benchmark 筛选功能 ==========
-
-// 全局变量存储 Peer Benchmark 原始数据和筛选状态
-let originalPeerData = [];
-let currentPeerCategory = 'all';
-let currentPeerFilters = {
-    search: '',
-    pwcScore: '',
-    usage: '',
-    sort: 'pwc-score'
-};
-
-// Peer 搜索筛选功能
-function filterPeerBenchmarkTable() {
-    const searchInput = document.getElementById('peerSearchInput');
-    currentPeerFilters.search = searchInput.value.toLowerCase();
-    applyAllPeerFilters();
-}
-
-// Peer 按分类筛选
-function filterPeerByCategory(category) {
-    console.log('🔍 Filtering peer by category:', category);
-    currentPeerCategory = category;
-    
-    // 更新按钮样式 (只在 peerFilterPanel 内更新)
-    const peerPanel = document.getElementById('peerFilterPanel');
-    if (peerPanel) {
-        const btns = peerPanel.querySelectorAll('.benchmark-cat-btn');
-        btns.forEach(btn => {
-            if (btn.dataset.category === category) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-    }
-    
-    // 应用所有筛选条件
-    applyAllPeerFilters();
-}
-
-// Peer 按 PWC 分数筛选
-function filterPeerByPwcScore(scoreRange) {
-    currentPeerFilters.pwcScore = scoreRange;
-    applyAllPeerFilters();
-}
-
-// Peer 按使用量筛选
-function filterPeerByUsage(usageLevel) {
-    currentPeerFilters.usage = usageLevel;
-    applyAllPeerFilters();
-}
-
-// Peer 排序功能
-function sortPeerBenchmarkTable(sortBy) {
-    currentPeerFilters.sort = sortBy;
-    applyAllPeerFilters();
-}
-
-// 应用所有 Peer 筛选条件
-function applyAllPeerFilters() {
-    if (originalPeerData.length === 0) {
-        originalPeerData = generatePeerBenchmarkData();
-    }
-    
-    let filteredData = [...originalPeerData];
-    
-    // Category 筛选
-    if (currentPeerCategory !== 'all') {
-        filteredData = filteredData.filter(model => {
-            return model.tabs && model.tabs.includes(currentPeerCategory);
-        });
-    }
-    
-    // 搜索筛选
-    if (currentPeerFilters.search) {
-        filteredData = filteredData.filter(model => 
-            model.name.toLowerCase().includes(currentPeerFilters.search) ||
-            model.category.toLowerCase().includes(currentPeerFilters.search) ||
-            model.industry.toLowerCase().includes(currentPeerFilters.search)
-        );
-    }
-    
-    // PWC 分数筛选
-    if (currentPeerFilters.pwcScore) {
-        filteredData = filteredData.filter(model => {
-            const score = model.pwcScore;
-            switch (currentPeerFilters.pwcScore) {
-                case '90-100': return score >= 90;
-                case '80-89': return score >= 80 && score < 90;
-                case '70-79': return score >= 70 && score < 80;
-                case '60-69': return score >= 60 && score < 70;
-                case 'below-60': return score < 60;
-                default: return true;
-            }
-        });
-    }
-    
-    // 使用量筛选
-    if (currentPeerFilters.usage) {
-        filteredData = filteredData.filter(model => {
-            const usage = model.usage;
-            switch (currentPeerFilters.usage) {
-                case 'high': return usage > 5000;
-                case 'medium': return usage >= 1000 && usage <= 5000;
-                case 'low': return usage < 1000;
-                default: return true;
-            }
-        });
-    }
-    
-    // 排序
-    filteredData.sort((a, b) => {
-        switch (currentPeerFilters.sort) {
-            case 'pwc-score':
-                return b.pwcScore - a.pwcScore;
-            case 'vertical-index':
-                return b.verticalIndex - a.verticalIndex;
-            case 'rating':
-                return b.rating - a.rating;
-            case 'usage':
-                return b.usage - a.usage;
-            case 'name':
-                return a.name.localeCompare(b.name);
-            default:
-                return b.pwcScore - a.pwcScore;
-        }
-    });
-    
-    // 更新表格显示
-    populatePeerBenchmarkTable(filteredData);
-}
-
-// 清除所有 Peer 筛选条件
-function clearPeerFilters() {
-    // 重置筛选状态
-    currentPeerFilters = {
-        search: '',
-        pwcScore: '',
-        usage: '',
-        sort: 'pwc-score'
-    };
-    currentPeerCategory = 'all';
-    
-    // 重置界面元素
-    const peerPanel = document.getElementById('peerFilterPanel');
-    if (peerPanel) {
-        const searchInput = peerPanel.querySelector('#peerSearchInput');
-        if (searchInput) searchInput.value = '';
-        
-        const sortSelect = peerPanel.querySelector('#peerSortSelect');
-        if (sortSelect) sortSelect.value = 'pwc-score';
-        
-        const pwcFilter = peerPanel.querySelector('#peerPwcFilter');
-        if (pwcFilter) pwcFilter.value = '';
-        
-        const usageFilter = peerPanel.querySelector('#peerUsageFilter');
-        if (usageFilter) usageFilter.value = '';
-        
-        // 重置分类按钮
-        const btns = peerPanel.querySelectorAll('.benchmark-cat-btn');
-        btns.forEach(btn => {
-            if (btn.dataset.category === 'all') {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-    }
-    
-    // 重新显示所有数据
-    applyAllPeerFilters();
-}
-
-// 导出 Peer 筛选函数
-window.filterPeerBenchmarkTable = filterPeerBenchmarkTable;
-window.filterPeerByCategory = filterPeerByCategory;
-window.filterPeerByPwcScore = filterPeerByPwcScore;
-window.filterPeerByUsage = filterPeerByUsage;
-window.sortPeerBenchmarkTable = sortPeerBenchmarkTable;
-window.clearPeerFilters = clearPeerFilters;
